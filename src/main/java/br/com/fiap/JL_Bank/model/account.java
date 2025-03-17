@@ -78,14 +78,6 @@ public class Account {
         return id + ", " + numero + ", " + agencia + ", " + nomeTitular + ", " +
             cpfTitular + ", " + dataAbertura + ", " + saldoInicial + ", " + ativa + ", " + tipoConta;
     }
-
-    
-
-
-    
-
-    
-
     
 }
 

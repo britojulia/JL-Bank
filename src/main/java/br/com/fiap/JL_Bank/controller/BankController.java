@@ -66,13 +66,14 @@ public class BankController {
         log.info("Buscando conta do Titular..." + cpfTitular);
         return ResponseEntity.ok(getAccountCpf(cpfTitular));
     }
+
                 
     //tornar conta inativa
     @DeleteMapping("/contas/{id}")
-    public ResponseEntity<Object> encerrarConta(@PathVariable Long id) {
+    public ResponseEntity<Object> encerrarCosnta(@PathVariable Long id) {
         log.info("Tornando conta inativa: " + id);
         var account = getAccountId(id);
-        account.setAtiva(false);
+        account.setAtiva(Boolean.FALSE);
         return ResponseEntity.ok(account);
     }
     
