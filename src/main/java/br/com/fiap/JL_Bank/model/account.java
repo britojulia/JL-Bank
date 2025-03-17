@@ -65,6 +65,14 @@ public class Account {
     }
 
     
+    public void setAtiva(Boolean ativa) {
+        this.ativa = ativa;
+    }
+
+
+    
+
+    
 
     
 }

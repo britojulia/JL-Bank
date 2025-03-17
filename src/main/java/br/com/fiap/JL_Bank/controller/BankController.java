@@ -6,9 +6,11 @@ import java.util.Locale.Category;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,7 +32,7 @@ public class BankController {
 
     //endpoint que cadastra conta
     @PostMapping("/contas")
-    public ResponseEntity<Account> create(@RequestBody Account account) {
+    public ResponseEntity<Account> criarConta(@RequestBody Account account) {
         log.info("Cadastrando uma nova conta " + account.getAgencia());
         repository.add(account);
         return ResponseEntity.status(201).body(account);
@@ -38,7 +40,7 @@ public class BankController {
 
     //bucas todas as contas
     @GetMapping("/contas")
-    public List<Account> index() {
+    public List<Account> listarTodasConta() {
         log.info("Retornando todas as contas");
         return repository;
     }
@@ -46,19 +48,39 @@ public class BankController {
 
     //buscar conta pelo ID
     @GetMapping("/contas/{id}")
-    public ResponseEntity<Account> get(@PathVariable Long id) {
+    public ResponseEntity<Account> getContaId(@PathVariable Long id) {
         log.info("Buscando conta..." + id);
         return ResponseEntity.ok(getAccountId(id));
             }
 
     //buscar conta pelo CPF
     @GetMapping("/contas/{cpfTitular}")
-    public ResponseEntity<Account> get(@PathVariable String cpfTitular) {
+    public ResponseEntity<Object> getContaCpf(@PathVariable String cpfTitular) {
         log.info("Buscando conta do Titular..." + cpfTitular);
         return ResponseEntity.ok(getAccountCpf(cpfTitular));
-                    }
+    }
                 
-        
+    //tornar conta inativa
+    @DeleteMapping("/contas/{id}")
+    public ResponseEntity<Object> encerrarConta(@PathVariable Long id) {
+        log.info("Tornando conta inativa: " + id);
+        Account account = getAccountId(id);
+        account.setAtiva(false);
+        return ResponseEntity.ok(account);
+    }
+    
+    //realizar depósito
+    @PutMapping("/contas/{id}")
+    public ResponseEntity<Account> update(@PathVariable Long id, @RequestBody Valor valor) {
+        log.info("Realizando depósito na conta " + id + " " + valor);
+
+        var categoryToUpdate = getCategory(id);
+        repository.remove(categoryToUpdate);
+        category.setId(id);
+        repository.add(category);
+        return ResponseEntity.ok(category);
+    }
+    
         
         
         
