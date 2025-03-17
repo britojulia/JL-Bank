@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale.Category;
 
+
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import br.com.fiap.JL_Bank.model.Account;
+import br.com.fiap.JL_Bank.model.Deposito;
+import br.com.fiap.JL_Bank.model.Pix;
+import br.com.fiap.JL_Bank.model.Saque;
 
 @RestController
 public class BankController {
@@ -64,37 +71,64 @@ public class BankController {
     @DeleteMapping("/contas/{id}")
     public ResponseEntity<Object> encerrarConta(@PathVariable Long id) {
         log.info("Tornando conta inativa: " + id);
-        Account account = getAccountId(id);
+        var account = getAccountId(id);
         account.setAtiva(false);
         return ResponseEntity.ok(account);
     }
     
     //realizar depósito
-    @PutMapping("/contas/{id}")
-    public ResponseEntity<Account> update(@PathVariable Long id, @RequestBody Valor valor) {
-        log.info("Realizando depósito na conta " + id + " " + valor);
-
-        var categoryToUpdate = getCategory(id);
-        repository.remove(categoryToUpdate);
-        category.setId(id);
-        repository.add(category);
-        return ResponseEntity.ok(category);
+    @PutMapping("/contas/depósito")
+    public ResponseEntity<Account> depositar(@RequestBody Deposito deposito) {
+        log.info("Realizando depósito na conta...");
+        var account = getAccountId(deposito.getId());
+        account.setSaldoInicial(account.getSaldoInicial()+ deposito.getValorDeposito());
+        return ResponseEntity.ok(account);
     }
-    
+
+    //realizar saque
+    @PutMapping("/contas/sacar")
+    public ResponseEntity<Account> sacar(@RequestBody Saque saque) {
+        log.info("Realizando saque na conta...");
+        var account = getAccountId(saque.getIdConta()); 
+        account.setSaldoInicial(account.getSaldoInicial() - saque.getValorSaque()); 
+        return ResponseEntity.ok(account);
+    }
+
+    //efetuar pix
+    @PutMapping("/pix")
+    public ResponseEntity<Account> realizarPix(@RequestBody Pix pix) {
+        Account contaOrigem = getAccountId(pix.getIdOrigem());
+        Account contaDestino = getAccountId(pix.getIdDestino());
+
+        contaOrigem.setSaldoInicial(contaOrigem.getSaldoInicial() - pix.getValorPix());
+        contaDestino.setSaldoInicial(contaDestino.getSaldoInicial() + pix.getValorPix());
+
+        return ResponseEntity.ok(contaOrigem); // Retorna conta de origem atualizada
+    }
+
         
         
         
         
                     
                 private Object getAccountCpf(String cpfTitular) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'getAccountCpf'");
-            }
+                    return repository.stream()
+                    .filter(c -> c.getCpfTitular().equals(cpfTitular))
+                    .findFirst()
+                    .orElseThrow(
+                            () -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND,
+                                    "Conta não encontrada"));
+                }
         
                 private Account getAccountId(Long id) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'getAccount'");
-        }
-
+                    return repository.stream()
+                    .filter(c -> c.getId().equals(id))
+                    .findFirst()
+                    .orElseThrow(
+                            () -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND,
+                                    "Conta não encontrada"));
+}
 
 }

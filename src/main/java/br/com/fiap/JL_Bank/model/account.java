@@ -69,6 +69,18 @@ public class Account {
         this.ativa = ativa;
     }
 
+    public void setSaldoInicial(Double saldoInicial) {
+        this.saldoInicial = saldoInicial;
+    }
+
+    @Override
+    public String toString() {
+        return id + ", " + numero + ", " + agencia + ", " + nomeTitular + ", " +
+            cpfTitular + ", " + dataAbertura + ", " + saldoInicial + ", " + ativa + ", " + tipoConta;
+    }
+
+    
+
 
     
 
