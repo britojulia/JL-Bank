@@ -3,7 +3,7 @@ package br.com.fiap.JL_Bank.model;
 import java.time.LocalDate;
 
 
-public class account {
+public class Account {
     private Long id;
     private String numero;
     private String agencia;
@@ -15,7 +15,7 @@ public class account {
     private Boolean ativa;
     private TipoConta tipoConta;
 
-    public account(Long id, String numero, String agencia, String nomeTitular, String cpfTitular,
+    public Account(Long id, String numero, String agencia, String nomeTitular, String cpfTitular,
             LocalDate dataAbertura, Double saldoInicial, Boolean ativa, TipoConta tipoConta) {
         this.id = id;
         this.numero = numero;
