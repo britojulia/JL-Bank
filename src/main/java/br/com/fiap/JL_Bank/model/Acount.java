@@ -7,7 +7,7 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
 
 
-public class Account {
+public class Acount{
     private Long id;
     private String numero;
     private String agencia;
@@ -31,7 +31,7 @@ public class Account {
     @NotNull(message = "O tipo da conta é obrigatorio")
     private TipoConta tipoConta;
 
-    public Account(Long id, String numero, String agencia, String nomeTitular, String cpfTitular,
+    public Acount(Long id, String numero, String agencia, String nomeTitular, String cpfTitular,
             LocalDate dataAbertura, Double saldoInicial, Boolean ativa, TipoConta tipoConta) {
         this.id = id;
         this.numero = numero;

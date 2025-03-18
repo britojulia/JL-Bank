@@ -2,8 +2,6 @@ package br.com.fiap.JL_Bank.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale.Category;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import br.com.fiap.JL_Bank.model.Account;
+import br.com.fiap.JL_Bank.model.Acount;
 import br.com.fiap.JL_Bank.model.Deposito;
 import br.com.fiap.JL_Bank.model.Pix;
 import br.com.fiap.JL_Bank.model.Saque;
@@ -30,7 +28,7 @@ public class BankController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private List<Account> repository = new ArrayList<>();
+    private List<Acount> repository = new ArrayList<>();
 
 
     //endpoint que retorna integrantes
@@ -41,7 +39,7 @@ public class BankController {
 
     //endpoint que cadastra conta
     @PostMapping("/conta")
-    public ResponseEntity<Account> criarConta(@Valid @RequestBody Account account) {
+    public ResponseEntity<Acount> criarConta(@Valid @RequestBody Acount account) {
         log.info("Cadastrando uma nova conta " + account.getAgencia());
         repository.add(account);
         return ResponseEntity.status(201).body(account);
@@ -49,7 +47,7 @@ public class BankController {
 
     //bucas todas as contas
     @GetMapping("/contas")
-    public List<Account> listarTodasConta() {
+    public List<Acount> listarTodasConta() {
         log.info("Retornando todas as contas");
         return repository;
     }
@@ -57,7 +55,7 @@ public class BankController {
 
     //buscar conta pelo ID
     @GetMapping("/contas/{id}")
-    public ResponseEntity<Account> getContaId(@PathVariable Long id) {
+    public ResponseEntity<Acount> getContaId(@PathVariable Long id) {
         log.info("Buscando conta..." + id);
         return ResponseEntity.ok(getAccountId(id));
             }
@@ -81,7 +79,7 @@ public class BankController {
     
     //realizar depósito
     @PutMapping("/conta/deposito")
-    public ResponseEntity<Account> depositar(@RequestBody Deposito deposito) {
+    public ResponseEntity<Acount> depositar(@RequestBody Deposito deposito) {
         log.info("Realizando depósito na conta...");
 
         if (deposito.getValorDeposito() == null || deposito.getValorDeposito() <= 0) {
@@ -96,7 +94,7 @@ public class BankController {
 
     //realizar saque
     @PutMapping("/conta/saque")
-    public ResponseEntity<Account> sacar(@RequestBody Saque saque) {
+    public ResponseEntity<Acount> sacar(@RequestBody Saque saque) {
         log.info("Realizando saque na conta...");
         var account = getAccountId(saque.getId());
         if (saque.getValorSaque() == null || saque.getValorSaque() <= 0 || saque.getValorSaque() > account.getSaldoInicial()) {
@@ -108,10 +106,10 @@ public class BankController {
 
     //realizar pix
     @PutMapping("/conta/pix")
-    public ResponseEntity<Account> realizarPix(@RequestBody Pix pix) {
+    public ResponseEntity<Acount> realizarPix(@RequestBody Pix pix) {
         log.info("Realizando transação tipo PIX...");
-        Account contaOrigem = getAccountId(pix.getIdOrigem());
-        Account contaDestino = getAccountId(pix.getIdDestino());
+        Acount contaOrigem = getAccountId(pix.getIdOrigem());
+        Acount contaDestino = getAccountId(pix.getIdDestino());
 
         if (pix.getValorPix() == null || pix.getValorPix() <= 0 || pix.getValorPix() > contaOrigem.getSaldoInicial()) {
             return ResponseEntity.badRequest().build();
@@ -134,7 +132,7 @@ public class BankController {
                                     "Conta não encontrada"));
                 }
         
-                private Account getAccountId(Long id) {
+                private Acount getAccountId(Long id) {
                     return repository.stream()
                     .filter(c -> c.getId().equals(id))
                     .findFirst()
