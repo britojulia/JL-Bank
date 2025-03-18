@@ -23,12 +23,12 @@ public class Account {
     private LocalDate dataAbertura;
 
     @NotNull
-    @PositiveOrZero(message = "O saldo inicial deve ser maior ou igual a zero")
+    @PositiveOrZero(message = "O saldo inicial deve ser maior ou igual a zero!")
     private Double saldoInicial;
 
     private Boolean ativa;
 
-    @NotNull(message = "O tipo da conta é obrigatório")
+    @NotNull(message = "O tipo da conta é obrigatorio")
     private TipoConta tipoConta;
 
     public Account(Long id, String numero, String agencia, String nomeTitular, String cpfTitular,
