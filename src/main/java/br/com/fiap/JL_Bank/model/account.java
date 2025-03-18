@@ -2,17 +2,33 @@ package br.com.fiap.JL_Bank.model;
 
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.PositiveOrZero;
+
 
 public class Account {
     private Long id;
     private String numero;
     private String agencia;
 
+    @NotNull(message = "O nome do titular é obrigatorio")
     private String nomeTitular;
+    
+    @NotNull(message = "O CPF do titular é obrigatorio")
     private String cpfTitular;
+
+    @NotNull
+    @PastOrPresent(message = "A data de abertura deve ser hoje ou no passado")
     private LocalDate dataAbertura;
+
+    @NotNull
+    @PositiveOrZero(message = "O saldo inicial deve ser maior ou igual a zero")
     private Double saldoInicial;
+
     private Boolean ativa;
+
+    @NotNull(message = "O tipo da conta é obrigatório")
     private TipoConta tipoConta;
 
     public Account(Long id, String numero, String agencia, String nomeTitular, String cpfTitular,

@@ -22,8 +22,10 @@ import br.com.fiap.JL_Bank.model.Account;
 import br.com.fiap.JL_Bank.model.Deposito;
 import br.com.fiap.JL_Bank.model.Pix;
 import br.com.fiap.JL_Bank.model.Saque;
+import jakarta.validation.Valid;
 
 @RestController
+
 public class BankController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -34,12 +36,12 @@ public class BankController {
     //endpoint que retorna integrantes
     @GetMapping("/")
     public String team() {
-        return "JL BANK - Integrantes: Julia, João, Maria";
+        return "JL BANK - Integrantes: Julia Brito - RM558831, Leonardo Iafrate - RM556857";
     }
 
     //endpoint que cadastra conta
-    @PostMapping("/contas")
-    public ResponseEntity<Account> criarConta(@RequestBody Account account) {
+    @PostMapping("/conta")
+    public ResponseEntity<Account> criarConta(@Valid @RequestBody Account account) {
         log.info("Cadastrando uma nova conta " + account.getAgencia());
         repository.add(account);
         return ResponseEntity.status(201).body(account);
@@ -61,7 +63,7 @@ public class BankController {
             }
 
     //buscar conta pelo CPF
-    @GetMapping("/contas/{cpfTitular}")
+    @GetMapping("/contas/cpf/{cpfTitular}")
     public ResponseEntity<Object> getContaCpf(@PathVariable String cpfTitular) {
         log.info("Buscando conta do Titular..." + cpfTitular);
         return ResponseEntity.ok(getAccountCpf(cpfTitular));
@@ -78,39 +80,49 @@ public class BankController {
     }
     
     //realizar depósito
-    @PutMapping("/contas/depósito")
+    @PutMapping("/conta/deposito")
     public ResponseEntity<Account> depositar(@RequestBody Deposito deposito) {
         log.info("Realizando depósito na conta...");
+
+        if (deposito.getValorDeposito() == null || deposito.getValorDeposito() <= 0) {
+            return ResponseEntity.badRequest().body(null); 
+        }
+
         var account = getAccountId(deposito.getId());
-        account.setSaldoInicial(account.getSaldoInicial()+ deposito.getValorDeposito());
+        account.setSaldoInicial(account.getSaldoInicial() + deposito.getValorDeposito());
+
         return ResponseEntity.ok(account);
-    }
+}
 
     //realizar saque
-    @PutMapping("/contas/sacar")
+    @PutMapping("/conta/saque")
     public ResponseEntity<Account> sacar(@RequestBody Saque saque) {
         log.info("Realizando saque na conta...");
-        var account = getAccountId(saque.getIdConta()); 
-        account.setSaldoInicial(account.getSaldoInicial() - saque.getValorSaque()); 
+        var account = getAccountId(saque.getId());
+        if (saque.getValorSaque() == null || saque.getValorSaque() <= 0 || saque.getValorSaque() > account.getSaldoInicial()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        account.setSaldoInicial(account.getSaldoInicial() - saque.getValorSaque());
         return ResponseEntity.ok(account);
-    }
+}
 
-    //efetuar pix
-    @PutMapping("/pix")
+    //realizar pix
+    @PutMapping("/conta/pix")
     public ResponseEntity<Account> realizarPix(@RequestBody Pix pix) {
+        log.info("Realizando transação tipo PIX...");
         Account contaOrigem = getAccountId(pix.getIdOrigem());
         Account contaDestino = getAccountId(pix.getIdDestino());
+
+        if (pix.getValorPix() == null || pix.getValorPix() <= 0 || pix.getValorPix() > contaOrigem.getSaldoInicial()) {
+            return ResponseEntity.badRequest().build();
+        }
 
         contaOrigem.setSaldoInicial(contaOrigem.getSaldoInicial() - pix.getValorPix());
         contaDestino.setSaldoInicial(contaDestino.getSaldoInicial() + pix.getValorPix());
 
-        return ResponseEntity.ok(contaOrigem); // Retorna conta de origem atualizada
+        return ResponseEntity.ok(contaOrigem);
     }
 
-        
-        
-        
-        
                     
                 private Object getAccountCpf(String cpfTitular) {
                     return repository.stream()
